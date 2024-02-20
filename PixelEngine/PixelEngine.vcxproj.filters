@@ -1,0 +1,213 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="gfx">
+      <UniqueIdentifier>{ccb714ba-9106-4efa-8888-2783e584ea45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\pixel_simulation">
+      <UniqueIdentifier>{0abe6f5c-8ca6-41a7-aa90-345277aa58a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\pixel_simulation\solid">
+      <UniqueIdentifier>{65c8b791-bf61-4cb6-9b20-b70c2b7781f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\pixel_simulation\gas">
+      <UniqueIdentifier>{ceaa88f5-9216-4a71-983a-4b2c7be78a46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\pixel_simulation\liquid">
+      <UniqueIdentifier>{2b849770-7432-4f2c-bc77-4dbccf3c0b5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\pixle_simulation">
+      <UniqueIdentifier>{a6a538ca-98a4-4f6b-8659-73436b0e88a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\pixle_simulation\solid">
+      <UniqueIdentifier>{39e18eff-8d63-4fb4-a108-d973da6f2ba9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\pixle_simulation\gas">
+      <UniqueIdentifier>{40afd3e1-1cda-469d-850b-74049dff19c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\pixle_simulation\liquid">
+      <UniqueIdentifier>{d1dbb2e0-6396-424c-851c-3101689bb01f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\pixel_simulation\solid\immovable">
+      <UniqueIdentifier>{2ba1948c-0d25-4a4c-8200-90222f51cf6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\pixel_simulation\solid\movable">
+      <UniqueIdentifier>{a1bc6503-fed6-404d-a1a2-0527ff23e721}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\pixle_simulation\solid\immovable">
+      <UniqueIdentifier>{623d2ff9-e92a-445f-8a33-baa1ea83b9a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\pixle_simulation\solid\movable">
+      <UniqueIdentifier>{3f01c457-23d8-415e-9a61-f8f768329101}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="simulation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="registry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="input_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDL2_gfxPrimitives.c">
+      <Filter>gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="element.cpp">
+      <Filter>Source Files\pixle_simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="pixel_simulation.cpp">
+      <Filter>Source Files\pixle_simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="sand.cpp">
+      <Filter>Source Files\pixle_simulation\solid\movable</Filter>
+    </ClCompile>
+    <ClCompile Include="movable.cpp">
+      <Filter>Source Files\pixle_simulation\solid\movable</Filter>
+    </ClCompile>
+    <ClCompile Include="water.cpp">
+      <Filter>Source Files\pixle_simulation\liquid</Filter>
+    </ClCompile>
+    <ClCompile Include="liquid.cpp">
+      <Filter>Source Files\pixle_simulation\liquid</Filter>
+    </ClCompile>
+    <ClCompile Include="gas.cpp">
+      <Filter>Source Files\pixle_simulation\gas</Filter>
+    </ClCompile>
+    <ClCompile Include="rubber.cpp">
+      <Filter>Source Files\pixle_simulation\solid\movable</Filter>
+    </ClCompile>
+    <ClCompile Include="smoke.cpp">
+      <Filter>Source Files\pixle_simulation\gas</Filter>
+    </ClCompile>
+    <ClCompile Include="steam.cpp">
+      <Filter>Source Files\pixle_simulation\gas</Filter>
+    </ClCompile>
+    <ClCompile Include="acid.cpp">
+      <Filter>Source Files\pixle_simulation\liquid</Filter>
+    </ClCompile>
+    <ClCompile Include="rock.cpp">
+      <Filter>Source Files\pixle_simulation\solid\immovable</Filter>
+    </ClCompile>
+    <ClCompile Include="dirt.cpp">
+      <Filter>Source Files\pixle_simulation\solid\movable</Filter>
+    </ClCompile>
+    <ClCompile Include="immovable.cpp">
+      <Filter>Source Files\pixle_simulation\solid\immovable</Filter>
+    </ClCompile>
+    <ClCompile Include="explosion.cpp">
+      <Filter>Source Files\pixle_simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="particle.cpp">
+      <Filter>Source Files\pixle_simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="wood.cpp">
+      <Filter>Source Files\pixle_simulation\solid\immovable</Filter>
+    </ClCompile>
+    <ClCompile Include="oil.cpp">
+      <Filter>Source Files\pixle_simulation\liquid</Filter>
+    </ClCompile>
+    <ClCompile Include="spark.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="simulation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="registry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="input_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2_gfxPrimitives.h">
+      <Filter>gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="pixel_simulation.h">
+      <Filter>Header Files\pixel_simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="element.h">
+      <Filter>Header Files\pixel_simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="solid.h">
+      <Filter>Header Files\pixel_simulation\solid</Filter>
+    </ClInclude>
+    <ClInclude Include="movable.h">
+      <Filter>Header Files\pixel_simulation\solid\movable</Filter>
+    </ClInclude>
+    <ClInclude Include="sand.h">
+      <Filter>Header Files\pixel_simulation\solid\movable</Filter>
+    </ClInclude>
+    <ClInclude Include="liquid.h">
+      <Filter>Header Files\pixel_simulation\liquid</Filter>
+    </ClInclude>
+    <ClInclude Include="water.h">
+      <Filter>Header Files\pixel_simulation\liquid</Filter>
+    </ClInclude>
+    <ClInclude Include="acid.h">
+      <Filter>Header Files\pixel_simulation\liquid</Filter>
+    </ClInclude>
+    <ClInclude Include="gas.h">
+      <Filter>Header Files\pixel_simulation\gas</Filter>
+    </ClInclude>
+    <ClInclude Include="smoke.h">
+      <Filter>Header Files\pixel_simulation\gas</Filter>
+    </ClInclude>
+    <ClInclude Include="steam.h">
+      <Filter>Header Files\pixel_simulation\gas</Filter>
+    </ClInclude>
+    <ClInclude Include="rubber.h">
+      <Filter>Header Files\pixel_simulation\solid\movable</Filter>
+    </ClInclude>
+    <ClInclude Include="immovable.h">
+      <Filter>Header Files\pixel_simulation\solid\immovable</Filter>
+    </ClInclude>
+    <ClInclude Include="rock.h">
+      <Filter>Header Files\pixel_simulation\solid\immovable</Filter>
+    </ClInclude>
+    <ClInclude Include="dirt.h">
+      <Filter>Header Files\pixel_simulation\solid\movable</Filter>
+    </ClInclude>
+    <ClInclude Include="particle.h">
+      <Filter>Header Files\pixel_simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="explosion.h">
+      <Filter>Header Files\pixel_simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="wood.h">
+      <Filter>Header Files\pixel_simulation\solid\immovable</Filter>
+    </ClInclude>
+    <ClInclude Include="oil.h">
+      <Filter>Header Files\pixel_simulation\liquid</Filter>
+    </ClInclude>
+    <ClInclude Include="spark.h">
+      <Filter>Header Files\pixel_simulation\solid\movable</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
