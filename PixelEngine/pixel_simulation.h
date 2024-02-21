@@ -47,8 +47,8 @@ public:
 	static const int WIDTH = 384, HEIGHT = 216;
 
 	element* grid[HEIGHT][WIDTH];
-	const int PAINT_BRUSH_CIRCLE_RADIUS = 6;
-	const int ERASE_BRUSH_CIRCLE_RADIUS = 1;
+	const int PAINT_BRUSH_CIRCLE_RADIUS = 8;
+	const int ERASE_BRUSH_CIRCLE_RADIUS = 8;
 	const int PARTICLE_BRUSH_CIRCLE_RADIUS = 50;
 	const int EXPLOSION_BRUSH_CIRCLE_RADIUS = 50;
 

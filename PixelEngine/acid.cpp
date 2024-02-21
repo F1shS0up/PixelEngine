@@ -11,8 +11,8 @@ acid::acid()
 	density = 1.0031f;
 	gravity = 150.f;
 	liquidDispersionDir = rand() % 2;
-	liquidDispersionDelay = 0.03f;
-	liquidDispersionCountdown = liquidDispersionDelay;
+	viscosity = 0.03f;
+	viscosityCountdown = viscosity;
 	explosionResistance = 8;
 	fireResistance = 100;
 }

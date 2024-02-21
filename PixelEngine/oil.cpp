@@ -13,11 +13,11 @@ oil::oil()
 	updated = false;
 	velocity = glm::vec2(0, 0);
 	positionHold = glm::vec2(0, 0);
-	density = 1.9f;
+	density = 1.7f;
 	gravity = 140.f;
 	liquidDispersionDir = rand() % 2;
-	liquidDispersionDelay = 0.1f;
-	liquidDispersionCountdown = liquidDispersionDelay;
+	viscosity = 0.1f;
+	viscosityCountdown = viscosity;
 	explosionResistance = 7;
 	fireResistance = -1;
 	fireSpreadDelay = 0.025f + (float)(RandomFloat() - 0.5f) / 100.f;

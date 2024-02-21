@@ -10,8 +10,8 @@ steam::steam()
 	density = 0.00058f;
 	gravity = 10.f;
 	gasDispersionDir = rand() % 2;
-	gasDispersionDelay = 0.05f;
-	gasDispersionCountdown = gasDispersionDelay;
+	viscosity = 0.2f;
+	viscosityCountdown = viscosity;
 	explosionResistance = 0;
 	fireResistance = 1000;
 }

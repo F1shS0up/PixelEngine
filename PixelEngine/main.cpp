@@ -17,6 +17,7 @@ int main(int argc, char* argv[])
 
 	double desiredDeltaTime = options::MAX_FPS != 0 ? 1000 / options::MAX_FPS : 1;
 	double deltaTime = 1;
+	double dtAV = 0;
 
 	while (sim->Running())
 	{
@@ -34,7 +35,9 @@ int main(int argc, char* argv[])
 		TickTack = std::chrono::steady_clock::now();
 
 		deltaTime = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(TickTack - Start).count() / 1'000'000'000.0;
-		std::cout << "FPS: " << 1 / deltaTime << std::endl;
+		dtAV += deltaTime;
+		dtAV /= 2;
+		std::cout << "AV_FPS: " << 1 / dtAV << std::endl;
 	}
 
 	sim->Clean();

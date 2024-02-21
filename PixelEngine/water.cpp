@@ -10,8 +10,8 @@ water::water()
 	density = 1.f;
 	gravity = 140.f;
 	liquidDispersionDir = rand() % 2;
-	liquidDispersionDelay = 0.f;
-	liquidDispersionCountdown = liquidDispersionDelay;
+	viscosity = 0.005f;
+	viscosityCountdown = viscosity;
 	explosionResistance = 7;
 	fireResistance = 100;
 }

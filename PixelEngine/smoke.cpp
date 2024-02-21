@@ -10,8 +10,8 @@ smoke::smoke()
 	density = 0.0007f;
 	gravity = 10.f;
 	gasDispersionDir = rand() % 2;
-	gasDispersionDelay = 0.25f;
-	gasDispersionCountdown = gasDispersionDelay;
+	viscosity = 0.2f;
+	viscosityCountdown = viscosity;
 	explosionResistance = 1;
 	fireResistance = 1000;
 	damagePerSecond = ((float)(rand() % 1001) / 10000.f) + 0.05f;

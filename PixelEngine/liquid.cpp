@@ -13,76 +13,97 @@ inline float RandomFloat()
 void liquid::Update(double* deltaTime, pixel_simulation* pxSim, int x, int y)
 {
 	element::Update(deltaTime, pxSim, x, y);
-	liquidDispersionCountdown -= *deltaTime;
+	viscosityCountdown -= *deltaTime;
 
 	if (!falling)
 	{
-		velocity += glm::vec2(0, gravity * *deltaTime);
-		positionHold += glm::vec2(velocity.x * *deltaTime, velocity.y * *deltaTime);
-		int xSteps = std::floor(std::abs(positionHold.x));
-		int ySteps = std::floor(std::abs(positionHold.y));
+		int incr = rand() % 2 == 1 ? 1 : -1;
 
-		positionHold = glm::vec2(positionHold.x - (velocity.x > 0 ? xSteps : -xSteps), positionHold.y - (velocity.y > 0 ? ySteps : -ySteps));
+		if (pxSim->InBounds(x, y + 1) && pxSim->grid[y + 1][x] != nullptr && !pxSim->grid[y + 1][x]->updated)
+		{
+			pxSim->grid[y + 1][x]->Update(deltaTime, pxSim, x, y + 1);
+		}
+		if (pxSim->InBounds(x + 1, y + 1) && pxSim->grid[y + 1][x + 1] != nullptr && !pxSim->grid[y + 1][x + 1]->updated)
+		{
+			pxSim->grid[y + 1][x + 1]->Update(deltaTime, pxSim, x + 1, y + 1);
+		}
+		if (pxSim->InBounds(x - 1, y + 1) && pxSim->grid[y + 1][x - 1] != nullptr && !pxSim->grid[y + 1][x - 1]->updated)
+		{
+			pxSim->grid[y + 1][x - 1]->Update(deltaTime, pxSim, x - 1, y + 1);
+		}
+		if (pxSim->InBounds(x + 1, y) && pxSim->grid[y][x + 1] != nullptr && !pxSim->grid[y][x + 1]->updated)
+		{
+			pxSim->grid[y][x + 1]->Update(deltaTime, pxSim, x + 1, y);
+		}
+		if (pxSim->InBounds(x - 1, y) && pxSim->grid[y][x - 1] != nullptr && !pxSim->grid[y][x - 1]->updated)
+		{
+			pxSim->grid[y][x - 1]->Update(deltaTime, pxSim, x - 1, y);
+		}
 
 		if (pxSim->InBounds(x, y + 1) && pxSim->grid[y + 1][x] == nullptr)
 		{
 			velocity = glm::vec2(0, 0);
 			falling = true;
 		}
-		else if (pxSim->InBounds(x + 1, y + 1) && pxSim->grid[y + 1][x + 1] == nullptr)
+		else if (viscosityCountdown <= 0 && pxSim->InBounds(x + incr, y + 1) && pxSim->grid[y + 1][x + incr] == nullptr)
 		{
-			velocity = glm::vec2(0, 0);
+			viscosityCountdown = viscosity;
+			MoveElement(pxSim, x, y, x + incr, y + 1);
+			return;
+		}
+		else if (viscosityCountdown <= 0 && pxSim->InBounds(x - incr, y + 1) && pxSim->grid[y + 1][x - incr] == nullptr)
+		{
+			viscosityCountdown = viscosity;
+			MoveElement(pxSim, x, y, x - incr, y + 1);
+			return;
+		}
+		else if (viscosityCountdown <= 0 && pxSim->InBounds(x, y + 1) && pxSim->grid[y + 1][x] != nullptr && pxSim->grid[y + 1][x]->density < density)
+		{
+			viscosityCountdown = viscosity + ((liquid*)pxSim->grid[y + 1][x])->viscosity;
+			FlipElement(pxSim, x, y, x, y + 1);
 			falling = true;
 		}
-		else if (pxSim->InBounds(x - 1, y + 1) && pxSim->grid[y + 1][x - 1] == nullptr)
+		else if (viscosityCountdown <= 0 && pxSim->InBounds(x + incr, y + 1) && pxSim->grid[y + 1][x + incr] != nullptr && pxSim->grid[y + 1][x + incr]->density < density)
 		{
-			velocity = glm::vec2(0, 0);
-			falling = true;
-		}
-		else if (ySteps != 0 && pxSim->InBounds(x, y + ySteps) && pxSim->grid[y + ySteps][x] != nullptr && pxSim->grid[y + ySteps][x]->density < density && !dynamic_cast<immovable*>(pxSim->grid[y + ySteps][x]))
-		{
-			velocity *= 1 - (pxSim->grid[y + ySteps][x]->density / density);
-			FlipElement(pxSim, x, y, x, y + ySteps);
+			viscosityCountdown = viscosity + ((liquid*)pxSim->grid[y + 1][x + incr])->viscosity;
+			FlipElement(pxSim, x, y, x + incr, y + 1);
 			return;
 		}
-		else if (ySteps != 0 && pxSim->InBounds(x + 1, y + ySteps) && pxSim->grid[y + ySteps][x + 1] != nullptr && pxSim->grid[y + ySteps][x + 1]->density < density && !dynamic_cast<immovable*>(pxSim->grid[y + ySteps][x + 1]))
+		else if (viscosityCountdown <= 0 && pxSim->InBounds(x - incr, y + 1) && pxSim->grid[y + 1][x - incr] != nullptr && pxSim->grid[y + 1][x - incr]->density < density)
 		{
-			velocity *= 1 - (pxSim->grid[y + ySteps][x + 1]->density / density);
-			FlipElement(pxSim, x, y, x + 1, y + ySteps);
+			viscosityCountdown = viscosity + ((liquid*)pxSim->grid[y + 1][x - incr])->viscosity;
+			FlipElement(pxSim, x, y, x - incr, y + 1);
 			return;
 		}
-		else if (ySteps != 0 && pxSim->InBounds(x - 1, y + ySteps) && pxSim->grid[y + ySteps][x - 1] != nullptr && pxSim->grid[y + ySteps][x - 1]->density < density && !dynamic_cast<immovable*>(pxSim->grid[y + ySteps][x - 1]))
+		else if (viscosityCountdown <= 0 && pxSim->InBounds(x + liquidDispersionDir, y) && pxSim->grid[y][x + liquidDispersionDir] == nullptr)
 		{
-			velocity *= 1 - (pxSim->grid[y + ySteps][x - 1]->density / density);
-			FlipElement(pxSim, x, y, x - 1, y + ySteps);
+			viscosityCountdown = viscosity;
+			MoveElement(pxSim, x, y, x + liquidDispersionDir, y);
 			return;
 		}
-		else if ((!pxSim->InBounds(x, y + 1) || (pxSim->InBounds(x, y + 1) && pxSim->grid[y + 1][x] != nullptr)) && liquidDispersionCountdown <= 0)
+		else if (viscosityCountdown <= 0 && pxSim->InBounds(x - liquidDispersionDir, y) && pxSim->grid[y][x - liquidDispersionDir] == nullptr)
 		{
-			if (pxSim->InBounds(x + (liquidDispersionDir == false ? -1 : 1), y) && (pxSim->grid[y][x + (liquidDispersionDir == false ? -1 : 1)] == nullptr))
-			{
-				liquidDispersionCountdown = liquidDispersionDelay;
-				MoveElement(pxSim, x, y, x + (liquidDispersionDir == false ? -1 : 1), y);
-			}
-			else
-			{
-				if (pxSim->InBounds(x + (liquidDispersionDir == false ? -1 : 1), y) && 
-					dynamic_cast<liquid*>(pxSim->grid[y][x + (liquidDispersionDir == false ? -1 : 1)]) &&
-					pxSim->grid[y][x + (liquidDispersionDir == false ? -1 : 1)]->density < density &&
-					(!pxSim->InBounds(x, y + 1) || !dynamic_cast<liquid*>(pxSim->grid[y + 1][x]) || pxSim->grid[y + 1][x]->density >= density))
-				{
-					liquidDispersionCountdown = liquidDispersionDelay * 2;
-					FlipElement(pxSim, x, y, x + (liquidDispersionDir == false ? -1 : 1), y);
-				}
-				else
-				{
-					liquidDispersionDir = liquidDispersionDir == false ? true : false;
-				}
-			}
+			viscosityCountdown = viscosity;
+			MoveElement(pxSim, x, y, x - liquidDispersionDir, y);
+			liquidDispersionDir = -liquidDispersionDir;
+			return;
+		}
+		else if (viscosityCountdown <= 0 && pxSim->InBounds(x + liquidDispersionDir, y) && pxSim->grid[y][x + liquidDispersionDir] != nullptr && pxSim->grid[y][x + liquidDispersionDir]->density < density)
+		{
+			viscosityCountdown = viscosity + ((liquid*)pxSim->grid[y][x + liquidDispersionDir])->viscosity;
+			FlipElement(pxSim, x, y, x + liquidDispersionDir, y);
+			return;
+		}
+		else if (viscosityCountdown <= 0 && pxSim->InBounds(x - liquidDispersionDir, y) && pxSim->grid[y][x - liquidDispersionDir] != nullptr && pxSim->grid[y][x - liquidDispersionDir]->density < density)
+		{
+			viscosityCountdown = viscosity + ((liquid*)pxSim->grid[y][x - liquidDispersionDir])->viscosity;
+			FlipElement(pxSim, x, y, x - liquidDispersionDir, y);
+			liquidDispersionDir = -liquidDispersionDir;
 			return;
 		}
 		else
 		{
+			liquidDispersionDir = -liquidDispersionDir;
 			if (onFire)CoolDownCheck(pxSim, x, y);
 			return;
 		}
@@ -104,16 +125,21 @@ void liquid::Update(double* deltaTime, pixel_simulation* pxSim, int x, int y)
 			int upcomingPositionedY = (float)yStep * velocityDir.y + 0.5f + y;
 			int upcomingPositionedX = (float)velocityDir.x + x;
 
+			if (pxSim->InBounds(upcomingPositionedX, upcomingPositionedY) && pxSim->grid[upcomingPositionedY][upcomingPositionedX] != nullptr && !pxSim->grid[upcomingPositionedY][upcomingPositionedX]->updated)
+			{
+				pxSim->grid[upcomingPositionedY][upcomingPositionedX]->Update(deltaTime, pxSim, upcomingPositionedX, upcomingPositionedY);
+			}
+
 			if (!pxSim->InBounds(upcomingPositionedX, upcomingPositionedY))
 			{
-				falling = false;
 				if (upcomingPositionedX < 0 || upcomingPositionedX >= pxSim->WIDTH)
 				{
-					velocity.x = 0;
+					HorizontalContact();
 				}
 				else if (upcomingPositionedY < 0 || upcomingPositionedY >= pxSim->HEIGHT)
 				{
-					velocity.y = 0;
+					VerticalContact();
+					liquidDispersionDir = rand() % 2 == 1 ? 1 : -1;
 				}
 				break;
 			}
@@ -123,16 +149,7 @@ void liquid::Update(double* deltaTime, pixel_simulation* pxSim, int x, int y)
 				{
 					velocity *= 1 - (pxSim->grid[upcomingPositionedY][upcomingPositionedX]->density / density);
 					FlipElement(pxSim, x, y, upcomingPositionedX, upcomingPositionedY);
-				}
-				else if (pxSim->InBounds(upcomingPositionedX + 1, upcomingPositionedY) && pxSim->grid[upcomingPositionedY][upcomingPositionedX + 1] != nullptr && pxSim->grid[upcomingPositionedY][upcomingPositionedX + 1]->density < density && !dynamic_cast<immovable*>(pxSim->grid[upcomingPositionedY][upcomingPositionedX + 1]))
-				{
-					velocity *= 1 - (pxSim->grid[upcomingPositionedY][upcomingPositionedX + 1]->density / density);
-					FlipElement(pxSim, x, y, upcomingPositionedX + 1, upcomingPositionedY);
-				}
-				else if (pxSim->InBounds(upcomingPositionedX - 1, upcomingPositionedY) && pxSim->grid[upcomingPositionedY][upcomingPositionedX - 1] != nullptr && pxSim->grid[upcomingPositionedY][upcomingPositionedX - 1]->density < density && !dynamic_cast<immovable*>(pxSim->grid[upcomingPositionedY][upcomingPositionedX - 1]))
-				{
-					velocity *= 1 - (pxSim->grid[upcomingPositionedY][upcomingPositionedX - 1]->density / density);
-					FlipElement(pxSim, x, y, upcomingPositionedX - 1, upcomingPositionedY);
+					falling = false;
 				}
 				else 
 				{
@@ -141,13 +158,13 @@ void liquid::Update(double* deltaTime, pixel_simulation* pxSim, int x, int y)
 					if (yMoved)
 					{
 						int retFlag;
-						MoveOnYAxis(pxSim, upcomingPositionedX, upcomingPositionedY, x, y, retFlag);
+						MoveOnYAxis(pxSim, upcomingPositionedX, upcomingPositionedY, x, y, deltaTime, retFlag);
 						if (retFlag == 2) break;
 					}
 					else if (xMoved)
 					{
 						int retFlag;
-						MoveOnXAxis(pxSim, upcomingPositionedX, upcomingPositionedY, x, y, retFlag);
+						MoveOnXAxis(pxSim, upcomingPositionedX, upcomingPositionedY, x, y, deltaTime, retFlag);
 						if (retFlag == 2) break;
 					}
 				}
@@ -167,16 +184,21 @@ void liquid::Update(double* deltaTime, pixel_simulation* pxSim, int x, int y)
 			int upcomingPositionedX = (float)xStep * velocityDir.x + 0.5f + x;
 			int upcomingPositionedY = (float)velocityDir.y + y;
 
+			if (pxSim->InBounds(upcomingPositionedX, upcomingPositionedY) && pxSim->grid[upcomingPositionedY][upcomingPositionedX] != nullptr && !pxSim->grid[upcomingPositionedY][upcomingPositionedX]->updated)
+			{
+				pxSim->grid[upcomingPositionedY][upcomingPositionedX]->Update(deltaTime, pxSim, upcomingPositionedX, upcomingPositionedY);
+			}
+
 			if (!pxSim->InBounds(upcomingPositionedX, upcomingPositionedY))
 			{
-				falling = false;
 				if (upcomingPositionedX < 0 || upcomingPositionedX >= pxSim->WIDTH)
 				{
-					velocity.x = 0;
+					HorizontalContact();
 				}
 				else if (upcomingPositionedY < 0 || upcomingPositionedY >= pxSim->HEIGHT)
 				{
-					velocity.y = 0;
+					VerticalContact();
+					liquidDispersionDir = rand() % 2 == 1 ? 1 : -1;
 				}
 				break;
 			}
@@ -186,17 +208,7 @@ void liquid::Update(double* deltaTime, pixel_simulation* pxSim, int x, int y)
 				{
 					velocity *= 1 - (pxSim->grid[upcomingPositionedY][upcomingPositionedX]->density / density);
 					FlipElement(pxSim, x, y, upcomingPositionedX, upcomingPositionedY);
-					break;
-				}
-				else if (pxSim->InBounds(upcomingPositionedX + 1, upcomingPositionedY) && pxSim->grid[upcomingPositionedY][upcomingPositionedX + 1] != nullptr && pxSim->grid[upcomingPositionedY][upcomingPositionedX + 1]->density < density && !dynamic_cast<immovable*>(pxSim->grid[upcomingPositionedY][upcomingPositionedX + 1]))
-				{
-					velocity *= 1 - (pxSim->grid[upcomingPositionedY][upcomingPositionedX + 1]->density / density);
-					FlipElement(pxSim, x, y, upcomingPositionedX + 1, upcomingPositionedY);
-				}
-				else if (pxSim->InBounds(upcomingPositionedX - 1, upcomingPositionedY) && pxSim->grid[upcomingPositionedY][upcomingPositionedX - 1] != nullptr && pxSim->grid[upcomingPositionedY][upcomingPositionedX - 1]->density < density && !dynamic_cast<immovable*>(pxSim->grid[upcomingPositionedY][upcomingPositionedX - 1]))
-				{
-					velocity *= 1 - (pxSim->grid[upcomingPositionedY][upcomingPositionedX - 1]->density / density);
-					FlipElement(pxSim, x, y, upcomingPositionedX - 1, upcomingPositionedY);
+					falling = false;
 				}
 				else
 				{
@@ -205,13 +217,13 @@ void liquid::Update(double* deltaTime, pixel_simulation* pxSim, int x, int y)
 					if (yMoved)
 					{
 						int retFlag;
-						MoveOnYAxis(pxSim, upcomingPositionedX, upcomingPositionedY, x, y, retFlag);
+						MoveOnYAxis(pxSim, upcomingPositionedX, upcomingPositionedY, x, y, deltaTime, retFlag);
 						if (retFlag == 2) break;
 					}
 					else if (xMoved)
 					{
 						int retFlag;
-						MoveOnXAxis(pxSim, upcomingPositionedX, upcomingPositionedY, x, y, retFlag);
+						MoveOnXAxis(pxSim, upcomingPositionedX, upcomingPositionedY, x, y, deltaTime, retFlag);
 						if (retFlag == 2) break;
 					}
 				}
@@ -223,26 +235,49 @@ void liquid::Update(double* deltaTime, pixel_simulation* pxSim, int x, int y)
 			}
 		}
 	}
-	
 }
 
 void liquid::MoveElement(pixel_simulation* pxSim, int& x, int& y, int xNew, int yNew)
 {
+	if (pxSim->grid[yNew][xNew] != nullptr) return;
 	pxSim->MoveElement(&x, &y, xNew, yNew);
 	if (onFire)CoolDownCheck(pxSim, x, y);
 	SetNeighborsFalling(pxSim, x, y);
 }
 void liquid::FlipElement(pixel_simulation* pxSim, int& x, int& y, int xNew, int yNew)
 {
+	if (onFire)CoolDownCheck(pxSim, x, y);
+	SetNeighborsFalling(pxSim, x, y);
 	pxSim->FlipElement(&x, &y, xNew, yNew);
 	if (onFire)CoolDownCheck(pxSim, x, y);
 	SetNeighborsFalling(pxSim, x, y);
 }
 
-void liquid::MoveOnXAxis(pixel_simulation* pxSim, int upcomingPositionedX, int upcomingPositionedY, int& x, int& y, int& retFlag)
+void liquid::VerticalContact()
+{
+	velocity.y = 0;
+	falling = false;
+}
+void liquid::HorizontalContact()
+{
+	velocity.x = 0;
+	falling = false;
+}
+
+void liquid::MoveOnXAxis(pixel_simulation* pxSim, int upcomingPositionedX, int upcomingPositionedY, int& x, int& y, double* deltaTime, int& retFlag)
 {
 	retFlag = 1;
 	int incr = rand() % 2 == 1 ? 1 : -1;
+
+	if (pxSim->InBounds(upcomingPositionedX, upcomingPositionedY + incr) && pxSim->grid[upcomingPositionedY + incr][upcomingPositionedX] != nullptr && !pxSim->grid[upcomingPositionedY + incr][upcomingPositionedX]->updated)
+	{
+		pxSim->grid[upcomingPositionedY + incr][upcomingPositionedX]->Update(deltaTime, pxSim, upcomingPositionedX, upcomingPositionedY + incr);
+	}
+	if (pxSim->InBounds(upcomingPositionedX, upcomingPositionedY - incr) && pxSim->grid[upcomingPositionedY - incr][upcomingPositionedX] != nullptr && !pxSim->grid[upcomingPositionedY - incr][upcomingPositionedX]->updated)
+	{
+		pxSim->grid[upcomingPositionedY - incr][upcomingPositionedX]->Update(deltaTime, pxSim, upcomingPositionedX, upcomingPositionedY - incr);
+	}
+
 	if (pxSim->InBounds(upcomingPositionedX, upcomingPositionedY + incr) && pxSim->grid[upcomingPositionedY + incr][upcomingPositionedX] == nullptr)
 	{
 		MoveElement(pxSim, x, y, upcomingPositionedX, upcomingPositionedY + incr);
@@ -251,26 +286,26 @@ void liquid::MoveOnXAxis(pixel_simulation* pxSim, int upcomingPositionedX, int u
 	{
 		MoveElement(pxSim, x, y, upcomingPositionedX, upcomingPositionedY - incr);
 	}
-	else if (pxSim->InBounds(x + (liquidDispersionDir == false ? -1 : 1), y) && pxSim->grid[y][x + (liquidDispersionDir == false ? -1 : 1)] == nullptr)
-	{
-		falling = false;
-	}
-	else if (pxSim->InBounds(x - (liquidDispersionDir == false ? -1 : 1), y) && pxSim->grid[y][x - (liquidDispersionDir == false ? -1 : 1)] == nullptr)
-	{
-		falling = false;
-		liquidDispersionDir = !liquidDispersionDir;
-	}
 	else
 	{
-		falling = false;
-		velocity.x = 0;
+		HorizontalContact();
 		{ retFlag = 2; return; };
 	}
 }
-void liquid::MoveOnYAxis(pixel_simulation* pxSim, int upcomingPositionedX, int upcomingPositionedY, int& x, int& y, int& retFlag)
+void liquid::MoveOnYAxis(pixel_simulation* pxSim, int upcomingPositionedX, int upcomingPositionedY, int& x, int& y, double* deltaTime, int& retFlag)
 {
 	retFlag = 1;
 	int incr = rand() % 2 == 1 ? 1 : -1;
+
+	if (pxSim->InBounds(upcomingPositionedX + incr, upcomingPositionedY) && pxSim->grid[upcomingPositionedY][upcomingPositionedX + incr] != nullptr && !pxSim->grid[upcomingPositionedY][upcomingPositionedX + incr]->updated)
+	{
+		pxSim->grid[upcomingPositionedY][upcomingPositionedX + incr]->Update(deltaTime, pxSim, upcomingPositionedX + incr, upcomingPositionedY);
+	}
+	if (pxSim->InBounds(upcomingPositionedX - incr, upcomingPositionedY) && pxSim->grid[upcomingPositionedY][upcomingPositionedX - incr] != nullptr && !pxSim->grid[upcomingPositionedY][upcomingPositionedX - incr]->updated)
+	{
+		pxSim->grid[upcomingPositionedY][upcomingPositionedX - incr]->Update(deltaTime, pxSim, upcomingPositionedX - incr, upcomingPositionedY);
+	}
+
 	if (pxSim->InBounds(upcomingPositionedX + incr, upcomingPositionedY) && pxSim->grid[upcomingPositionedY][upcomingPositionedX + incr] == nullptr)
 	{
 		MoveElement(pxSim, x, y, upcomingPositionedX + incr, upcomingPositionedY);
@@ -279,19 +314,10 @@ void liquid::MoveOnYAxis(pixel_simulation* pxSim, int upcomingPositionedX, int u
 	{
 		MoveElement(pxSim, x, y, upcomingPositionedX - incr, upcomingPositionedY);
 	}
-	else if (pxSim->InBounds(x + (liquidDispersionDir == false ? -1 : 1), y) && pxSim->grid[y][x + (liquidDispersionDir == false ? -1 : 1)] == nullptr)
-	{
-		falling = false;
-	}
-	else if (pxSim->InBounds(x - (liquidDispersionDir == false ? -1 : 1), y) && pxSim->grid[y][x - (liquidDispersionDir == false ? -1 : 1)] == nullptr)
-	{
-		falling = false;
-		liquidDispersionDir = !liquidDispersionDir;
-	}
 	else
 	{
-		falling = false;
-		velocity.y = 0;
+		VerticalContact();
+		liquidDispersionDir = rand() % 2 == 1 ? 1 : -1;
 		{ retFlag = 2; return; };
 	}
 }
@@ -300,7 +326,7 @@ void liquid::Reset()
 {
 	velocity = glm::vec2(0, 0);
 	positionHold = glm::vec2(0, 0);
-	liquidDispersionCountdown = liquidDispersionDelay;
+	viscosityCountdown = viscosity;
 }
 
 void liquid::TransferVelocity(glm::vec2)

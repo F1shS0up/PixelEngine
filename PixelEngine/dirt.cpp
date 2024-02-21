@@ -8,7 +8,7 @@ dirt::dirt()
 	updated = false;
 	velocity = glm::vec2(0, 0);
 	positionHold = glm::vec2(0, 0);
-	density = 1.4f;
+	density = 3.4f;
 	gravity = 190.f;
 	conserveEnergyMultiplier = .2f;
 	conserveEnergyLimit = 50;

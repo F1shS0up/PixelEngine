@@ -40,6 +40,11 @@ void movable::Update(double* deltaTime, pixel_simulation* pxSim, int x, int y)
 			int upcomingPositionedY = (float)yStep * velocityDir.y + 0.5f + y;
 			int upcomingPositionedX = (float)velocityDir.x + x;
 
+			if (pxSim->InBounds(upcomingPositionedX, upcomingPositionedY) && pxSim->grid[upcomingPositionedY][upcomingPositionedX] != nullptr && !pxSim->grid[upcomingPositionedY][upcomingPositionedX]->updated)
+			{
+				pxSim->grid[upcomingPositionedY][upcomingPositionedX]->Update(deltaTime, pxSim, upcomingPositionedX, upcomingPositionedY);
+			}
+
 			if (!pxSim->InBounds(upcomingPositionedX, upcomingPositionedY))
 			{
 				if (upcomingPositionedX < 0 || upcomingPositionedX >= pxSim->WIDTH)
@@ -93,6 +98,11 @@ void movable::Update(double* deltaTime, pixel_simulation* pxSim, int x, int y)
 		{
 			int upcomingPositionedX = (float)xStep * velocityDir.x + 0.5f + x;
 			int upcomingPositionedY = (float)velocityDir.y + y;
+
+			if (pxSim->InBounds(upcomingPositionedX, upcomingPositionedY) && pxSim->grid[upcomingPositionedY][upcomingPositionedX] != nullptr && !pxSim->grid[upcomingPositionedY][upcomingPositionedX]->updated)
+			{ 
+				pxSim->grid[upcomingPositionedY][upcomingPositionedX]->Update(deltaTime, pxSim, upcomingPositionedX, upcomingPositionedY); 
+			}
 
 			if (!pxSim->InBounds(upcomingPositionedX, upcomingPositionedY))
 			{
@@ -169,6 +179,16 @@ void movable::MoveOnXAxis(pixel_simulation* pxSim, int upcomingPositionedX, int 
 {
 	retFlag = 1;
 	int incr = rand() % 2 == 0 ? -1 : 1;
+
+	if (pxSim->InBounds(upcomingPositionedX, upcomingPositionedY + incr) && pxSim->grid[upcomingPositionedY + incr][upcomingPositionedX] != nullptr && !pxSim->grid[upcomingPositionedY + incr][upcomingPositionedX]->updated)
+	{
+		pxSim->grid[upcomingPositionedY + incr][upcomingPositionedX]->Update(deltaTime, pxSim, upcomingPositionedX, upcomingPositionedY + incr);
+	}
+	if (pxSim->InBounds(upcomingPositionedX, upcomingPositionedY - incr) && pxSim->grid[upcomingPositionedY - incr][upcomingPositionedX] != nullptr && !pxSim->grid[upcomingPositionedY - incr][upcomingPositionedX]->updated)
+	{
+		pxSim->grid[upcomingPositionedY - incr][upcomingPositionedX]->Update(deltaTime, pxSim, upcomingPositionedX, upcomingPositionedY - incr);
+	}
+
 	if (pxSim->InBounds(upcomingPositionedX, upcomingPositionedY + incr) && (pxSim->grid[upcomingPositionedY + incr][upcomingPositionedX] == nullptr ||
 		pxSim->grid[upcomingPositionedY + incr][upcomingPositionedX] != nullptr && !dynamic_cast<solid*>(pxSim->grid[upcomingPositionedY + incr][upcomingPositionedX]) &&
 		pxSim->grid[upcomingPositionedY + incr][upcomingPositionedX]->density < density))
@@ -176,14 +196,17 @@ void movable::MoveOnXAxis(pixel_simulation* pxSim, int upcomingPositionedX, int 
 		if (pxSim->grid[upcomingPositionedY + incr][upcomingPositionedX] != nullptr)
 		{
 			velocity *= (1 - (pxSim->grid[upcomingPositionedY + incr][upcomingPositionedX]->density / density));
+			FlipElement(pxSim, x, y, upcomingPositionedX, upcomingPositionedY + incr);
 		}
-
-		srand(SDL_GetTicks());
-		if (RandomFloat() < inertialResistance)
+		else
 		{
-			falling = false;
+			srand(SDL_GetTicks());
+			if (RandomFloat() < inertialResistance)
+			{
+				falling = false;
+			}
+			MoveElement(pxSim, x, y, upcomingPositionedX, upcomingPositionedY + incr);
 		}
-		MoveElement(pxSim, x, y, upcomingPositionedX, upcomingPositionedY + incr);
 	}
 	else if (pxSim->InBounds(upcomingPositionedX, upcomingPositionedY - incr) && (pxSim->grid[upcomingPositionedY - incr][upcomingPositionedX] == nullptr ||
 		pxSim->grid[upcomingPositionedY - incr][upcomingPositionedX] != nullptr && !dynamic_cast<solid*>(pxSim->grid[upcomingPositionedY - incr][upcomingPositionedX]) &&
@@ -192,14 +215,17 @@ void movable::MoveOnXAxis(pixel_simulation* pxSim, int upcomingPositionedX, int 
 		if (pxSim->grid[upcomingPositionedY - incr][upcomingPositionedX] != nullptr)
 		{
 			velocity *= (1 - (pxSim->grid[upcomingPositionedY - incr][upcomingPositionedX]->density / density));
+			FlipElement(pxSim, x, y, upcomingPositionedX, upcomingPositionedY - incr);
 		}
-
-		srand(SDL_GetTicks());
-		if (RandomFloat() < inertialResistance)
+		else
 		{
-			falling = false;
+			srand(SDL_GetTicks());
+			if (RandomFloat() < inertialResistance)
+			{
+				falling = false;
+			}
+			MoveElement(pxSim, x, y, upcomingPositionedX, upcomingPositionedY - incr);
 		}
-		MoveElement(pxSim, x, y, upcomingPositionedX, upcomingPositionedY - incr);
 	}
 	else
 	{
@@ -211,37 +237,53 @@ void movable::MoveOnYAxis(pixel_simulation* pxSim, int upcomingPositionedX, int 
 {
 	retFlag = 1;
 	int incr = rand() % 2 == 0 ? -1 : 1;
+
+	if (pxSim->InBounds(upcomingPositionedX + incr, upcomingPositionedY) && pxSim->grid[upcomingPositionedY][upcomingPositionedX + incr] != nullptr && !pxSim->grid[upcomingPositionedY][upcomingPositionedX + incr]->updated)
+	{
+		pxSim->grid[upcomingPositionedY][upcomingPositionedX + incr]->Update(deltaTime, pxSim, upcomingPositionedX + incr, upcomingPositionedY);
+	}
+	if (pxSim->InBounds(upcomingPositionedX - incr, upcomingPositionedY) && pxSim->grid[upcomingPositionedY][upcomingPositionedX - incr] != nullptr && !pxSim->grid[upcomingPositionedY][upcomingPositionedX - incr]->updated)
+	{
+		pxSim->grid[upcomingPositionedY][upcomingPositionedX - incr]->Update(deltaTime, pxSim, upcomingPositionedX - incr, upcomingPositionedY);
+	}
+
 	if (pxSim->InBounds(upcomingPositionedX + incr, upcomingPositionedY) && (pxSim->grid[upcomingPositionedY][upcomingPositionedX + incr] == nullptr ||
-		pxSim->grid[upcomingPositionedY][upcomingPositionedX + incr] != nullptr && !dynamic_cast<solid*>(pxSim->grid[upcomingPositionedY][upcomingPositionedX + incr]) &&
-		pxSim->grid[upcomingPositionedY][upcomingPositionedX + incr]->density < density))
+		(pxSim->grid[upcomingPositionedY][upcomingPositionedX + incr] != nullptr && !dynamic_cast<solid*>(pxSim->grid[upcomingPositionedY][upcomingPositionedX + incr]) &&
+		pxSim->grid[upcomingPositionedY][upcomingPositionedX + incr]->density < density)))
 	{
 		if (pxSim->grid[upcomingPositionedY][upcomingPositionedX + incr] != nullptr)
 		{
 			velocity *= (1 - (pxSim->grid[upcomingPositionedY][upcomingPositionedX + incr]->density / density));
+			FlipElement(pxSim, x, y, upcomingPositionedX + incr, upcomingPositionedY);
 		}
-
-		srand(SDL_GetTicks());
-		if (RandomFloat() < inertialResistance)
+		else
 		{
-			falling = false;
+			srand(SDL_GetTicks());
+			if (RandomFloat() < inertialResistance)
+			{
+				falling = false;
+			}
+			MoveElement(pxSim, x, y, upcomingPositionedX + incr, upcomingPositionedY);
 		}
-		MoveElement(pxSim, x, y, upcomingPositionedX + incr, upcomingPositionedY);
 	}
 	else if (pxSim->InBounds(upcomingPositionedX - incr, upcomingPositionedY) && (pxSim->grid[upcomingPositionedY][upcomingPositionedX - incr] == nullptr ||
-		pxSim->grid[upcomingPositionedY][upcomingPositionedX - incr] != nullptr && !dynamic_cast<solid*>(pxSim->grid[upcomingPositionedY][upcomingPositionedX - incr]) &&
-		pxSim->grid[upcomingPositionedY][upcomingPositionedX - incr]->density < density))
+		(pxSim->grid[upcomingPositionedY][upcomingPositionedX - incr] != nullptr && !dynamic_cast<solid*>(pxSim->grid[upcomingPositionedY][upcomingPositionedX - incr]) &&
+		pxSim->grid[upcomingPositionedY][upcomingPositionedX - incr]->density < density)))
 	{
 		if (pxSim->grid[upcomingPositionedY][upcomingPositionedX - incr] != nullptr)
 		{
 			velocity *= (1 - (pxSim->grid[upcomingPositionedY][upcomingPositionedX - incr]->density / density));
+			FlipElement(pxSim, x, y, upcomingPositionedX - incr, upcomingPositionedY);
 		}
-
-		srand(SDL_GetTicks());
-		if (RandomFloat() < inertialResistance)
+		else
 		{
-			falling = false;
+			srand(SDL_GetTicks());
+			if (RandomFloat() < inertialResistance)
+			{
+				falling = false;
+			}
+			MoveElement(pxSim, x, y, upcomingPositionedX - incr, upcomingPositionedY);
 		}
-		MoveElement(pxSim, x, y, upcomingPositionedX - incr, upcomingPositionedY);
 	}
 	else
 	{

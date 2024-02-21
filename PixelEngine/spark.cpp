@@ -1,5 +1,6 @@
 #include "spark.h"
 #include <algorithm>
+#include <iostream>
 
 spark::spark()
 {

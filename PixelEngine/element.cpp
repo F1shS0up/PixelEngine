@@ -18,6 +18,7 @@ element::~element()
 
 void element::Update(double* deltaTime, pixel_simulation* pxSim, int x, int y)
 {
+	updated = true;
 	if (onFire)
 	{
 		instantiateSmokeCountdown -= *deltaTime;
